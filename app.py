@@ -5,8 +5,17 @@ from werkzeug.utils import secure_filename
 from generator import build_pdf
 
 app = Flask(__name__)
-UPLOAD_FOLDER = 'uploads'
+
+# --- CONFIGURACIÓN DE RUTAS ---
+# Esto asegura que la carpeta se cree en la raíz del proyecto en Render
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# ESTA ES LA CLAVE: Si la carpeta no existe, la creamos al arrancar
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+# ------------------------------
 
 @app.route('/')
 def index():
