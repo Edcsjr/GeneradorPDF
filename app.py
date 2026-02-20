@@ -56,21 +56,19 @@ def generate():
 
 @app.after_request
 def cleanup(response):
-    # Definimos la ruta de la carpeta de subidas
-    folder = app.config['UPLOAD_FOLDER']
-    
-    # Recorremos los archivos y los borramos uno por uno
-    for filename in os.listdir(folder):
-        file_path = os.path.join(folder, filename)
-        try:
-            if os.path.isfile(file_path) or os.path.islink(file_path):
-                os.unlink(file_path) # Borra archivos
-            elif os.path.isdir(file_path):
-                shutil.rmtree(file_path) # Borra carpetas si las hubiera
-        except Exception as e:
-            print(f'Error al borrar {file_path}: {e}')
-            
+    folder = app.config.get('UPLOAD_FOLDER')
+    if folder and os.path.exists(folder): # Verifica si existe antes de listar
+        for filename in os.listdir(folder):
+            file_path = os.path.join(folder, filename)
+            try:
+                if os.path.isfile(file_path) or os.path.islink(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+            except Exception as e:
+                print(f'Error al borrar {file_path}: {e}')
     return response
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
